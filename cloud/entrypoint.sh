@@ -13,6 +13,8 @@ export HERMES_DASHBOARD_BASIC_AUTH_PASSWORD="${HERMES_DASHBOARD_BASIC_AUTH_PASSW
 export HERMES_DASHBOARD_BASIC_AUTH_SECRET="${HERMES_DASHBOARD_BASIC_AUTH_SECRET:-hermes-render-cloud-persistent-token-signing-secret-2026}"
 export HERMES_HOME="/opt/data"
 export HERMES_WRITE_SAFE_ROOT="/opt/data"
+export HERMES_WEB_DIST="/opt/hermes/apps/desktop/dist-webapp"
+export HERMES_UI_SURFACE="webapp"
 export PYTHONUNBUFFERED=1
 
 # Resolve Python and Hermes binaries
@@ -78,6 +80,15 @@ if not ba.get('password_hash') and not ba.get('password'):
     ba['password_hash'] = 'scrypt' + '$' + '16384' + '$' + '8' + '$' + '1' + '$' + 'aSijr7grIdbXMF8yI9DvAA==' + '$' + 'TelcVwk+9APn8LUrCZaXF468X5h2VGca7a7QRt3nxeY='
 if not ba.get('secret'):
     ba['secret'] = 'hermes-render-cloud-persistent-token-signing-secret-2026'
+
+webapp = cfg.setdefault('webapp', {})
+webapp['enabled'] = True
+webapp['host'] = '0.0.0.0'
+import os
+try:
+    webapp['port'] = int(os.environ.get('PORT', 8000))
+except Exception:
+    webapp['port'] = 8000
 
 p.write_text(yaml.safe_dump(cfg))
 "

@@ -1458,6 +1458,10 @@ def start_server(
     # The SPA bootstrap reads this so profile-less deep links (/chat?resume=<id>) inherit the
     # launcher's preselected profile instead of silently running in the launch scope (#73085).
     app.state.initial_profile = str(initial_profile or "")
+    if "HERMES_UI_SURFACE" in os.environ:
+        app.state.ui_surface = os.environ["HERMES_UI_SURFACE"]
+    if "HERMES_WEB_DIST" in os.environ:
+        app.state.web_dist = Path(os.environ["HERMES_WEB_DIST"])
 
     config, server = _build_uvicorn_server(host, port, ssh_isolated=bool(ssh_session_token))
 

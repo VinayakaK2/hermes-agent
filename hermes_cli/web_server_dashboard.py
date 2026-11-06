@@ -156,7 +156,7 @@ def mount_spa(application: FastAPI):
     # them unconditionally makes the dashboard recover the moment a build appears on disk — no restart
     # needed.
     def web_dist() -> Path:
-        return getattr(application.state, "web_dist", None) or WEB_DIST
+        return getattr(application.state, "web_dist", None) or (Path(os.environ["HERMES_WEB_DIST"]) if "HERMES_WEB_DIST" in os.environ else WEB_DIST)
 
     def _serve_index(request: Request, prefix: str = ""):
         """index.html with the session token + base-path injected.
@@ -171,11 +171,11 @@ def mount_spa(application: FastAPI):
         except OSError:
             # Partial build / wiped dist / permissions: same JSON 404 as a fully-missing dist. The
             # Webapp's bundle is built by `hermes webapp`, not by the dashboard's web project.
-            webapp = getattr(application.state, "ui_surface", "dashboard") == "webapp"
+            webapp = (getattr(application.state, "ui_surface", "dashboard") == "webapp" or os.environ.get("HERMES_UI_SURFACE") == "webapp")
             missing = ("The Webapp is not built. Run: hermes webapp" if webapp
                        else "Frontend not built. Run: pnpm --dir web run build")
             return JSONResponse({"error": missing}, status_code=404)
-        if getattr(application.state, "ui_surface", "dashboard") == "webapp":
+        if (getattr(application.state, "ui_surface", "dashboard") == "webapp" or os.environ.get("HERMES_UI_SURFACE") == "webapp"):
             # A bundle `hermes update` could not rebuild was built for the code before the update:
             # refuse it until `hermes webapp` rebuilds it.
             from gateway.webapp_listener import bundle_stale_reason
@@ -185,7 +185,7 @@ def mount_spa(application: FastAPI):
         chat_js = "true" if _DASHBOARD_EMBEDDED_CHAT_ENABLED else "false"
         gated = bool(getattr(application.state, "auth_required", False))
         # Only a host that records its surface (the gateway's Webapp) names it to the page.
-        surface = getattr(application.state, "ui_surface", None)
+        surface = getattr(application.state, "ui_surface", None) or os.environ.get("HERMES_UI_SURFACE")
         surface_js = "" if surface is None else f"window.__HERMES_UI_SURFACE__={json.dumps(surface)};"
         # Webapp grants host files and shell.exec as well as PTYs: its existing
         # session token must come from the operator, never anonymous HTML. The

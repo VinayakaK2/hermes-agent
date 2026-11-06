@@ -11,6 +11,7 @@ a function over state, not a table field.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -75,7 +76,7 @@ POLICIES: dict[str, SurfacePolicy] = {
 
 def surface(state: Any) -> str:
     """The surface *state*'s app serves (see the module docstring)."""
-    recorded = getattr(state, "ui_surface", None)
+    recorded = getattr(state, "ui_surface", None) or os.environ.get("HERMES_UI_SURFACE")
     if recorded:
         return recorded
     return "gateway" if getattr(state, "gateway_runner", None) is not None else "dashboard"
