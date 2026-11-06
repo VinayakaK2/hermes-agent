@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: hermes-agent
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: API_SERVER_HOST
+        value: "0.0.0.0"
+      - key: API_SERVER_PORT
+        value: "8000"
+      - key: API_SERVER_ENABLED
+        value: "true"
+      - key: API_SERVER_KEY
+        generateValue: true
+      - key: HERMES_API_BASE
+        value: "https://omniroute-ai-5hys.onrender.com/v1"
+      - key: HERMES_MODEL
+        value: "antigravity/claude-sonnet-4-6"
+      - key: HF_DATASET_ID
+        value: "VinayakaK/hermes-storage"
+      - key: HF_TOKEN
+        sync: false
+      - key: E2B_API_KEY
+        sync: false

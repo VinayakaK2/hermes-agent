@@ -1,0 +1,19 @@
+# Production Cloud Configuration for Hermes Agent on Render
+# Connected to OmniRoute proxy for zero-cost Claude 3.7 / Sonnet 4-6 & Gemini inference
+
+model:
+  default: "omniroute/antigravity/claude-sonnet-4-6"
+
+providers:
+  omniroute:
+    base_url: "https://omniroute-ai-5hys.onrender.com/v1"
+    api_key: "${OMNIROUTE_API_KEY}"
+
+terminal:
+  backend: "local"
+
+platforms:
+  api_server:
+    enabled: true
+    host: "0.0.0.0"
+    port: 8000
