@@ -8,18 +8,16 @@ services:
     envVars:
       - key: PORT
         value: 8000
-      - key: API_SERVER_HOST
-        value: "0.0.0.0"
-      - key: API_SERVER_PORT
-        value: "8000"
-      - key: API_SERVER_ENABLED
+      - key: HERMES_DASHBOARD
         value: "true"
-      - key: API_SERVER_KEY
-        generateValue: true
-      - key: HERMES_API_BASE
-        value: "https://omniroute-ai-5hys.onrender.com/v1"
-      - key: HERMES_MODEL
-        value: "antigravity/claude-sonnet-4-6"
+      - key: HERMES_DASHBOARD_HOST
+        value: "0.0.0.0"
+      - key: HERMES_DASHBOARD_PORT
+        value: "8000"
+      - key: HERMES_DASHBOARD_BASIC_AUTH_USERNAME
+        value: "admin"
+      - key: HERMES_DASHBOARD_BASIC_AUTH_PASSWORD
+        value: "5002112A"
       - key: HF_DATASET_ID
         value: "VinayakaK/hermes-storage"
       - key: HF_TOKEN
