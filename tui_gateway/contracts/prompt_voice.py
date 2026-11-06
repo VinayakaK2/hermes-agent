@@ -29,6 +29,15 @@ class PromptSubmitParams(SessionParams):
     consent: ``confirm_truncate`` plus one durable target (``truncate_before_row_id`` preferred,
     ``truncate_before_message_id``, or the legacy ``truncate_before_user_ordinal``)."""
 
+    model_config = SessionParams.model_config | {"extra": "allow"}
+
+    submission_id: str | None = None
+    request_id: str | None = None
+    input_id: str | None = None
+    attachments: list[JsonValue] | None = None
+    finite: bool | None = None
+    unattended: bool | None = None
+
     text: JsonValue = ""
     display_kind: str | None = None  # only "hidden" is honoured; anything else renders as a user row
     interrupted: bool | None = None  # client-side barge-in: the turn's model message carries the note

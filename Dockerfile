@@ -46,9 +46,14 @@ COPY hermes_cli/web_server.py /opt/hermes/hermes_cli/web_server.py
 COPY hermes_cli/web_server_surface.py /opt/hermes/hermes_cli/web_server_surface.py
 COPY hermes_cli/web_server_dashboard.py /opt/hermes/hermes_cli/web_server_dashboard.py
 
+# Copy updated tui_gateway contract modules for Desktop Webapp compatibility
+COPY tui_gateway/contracts/sessions.py /opt/hermes/tui_gateway/contracts/sessions.py
+COPY tui_gateway/contracts/prompt_voice.py /opt/hermes/tui_gateway/contracts/prompt_voice.py
+COPY tui_gateway/contracts/registry.py /opt/hermes/tui_gateway/contracts/registry.py
+
 RUN chmod +x /opt/hermes/cloud/entrypoint.sh /opt/hermes/cloud/hf_sync.py \
     && mkdir -p /opt/data /tmp/hermes-runtime \
-    && chown -R 10000:10000 /opt/data /opt/hermes/cloud /tmp/hermes-runtime /opt/hermes/hermes_cli \
+    && chown -R 10000:10000 /opt/data /opt/hermes/cloud /tmp/hermes-runtime /opt/hermes/hermes_cli /opt/hermes/tui_gateway \
     && chmod -R 777 /opt/data /tmp/hermes-runtime
 
 USER hermes

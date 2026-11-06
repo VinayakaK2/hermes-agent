@@ -109,20 +109,19 @@ def _report(kind: str, name: str, exc: ValidationError) -> None:
 
 
 def validate_params(contract: MethodContract | ServerRequestContract, params: dict) -> tuple[dict | None, str | None]:
-    """Reject UNKNOWN keys (``4000`` with the key path) — the one check no handler performs, and the
-    one that catches a renamed or misspelled field on either side. Required / type errors are left to
-    the handler, which owns its documented domain codes (``4006`` missing session_id, ``4015`` bad
-    url, …) and which clients already branch on; ``check_params_accepted`` closes the loop by
-    flagging a handler that SUCCEEDS on params the contract calls invalid."""
+    """Reject UNKNOWN keys (``4000`` with the key path) in strict test isolation mode.
+    In normal runtime, allow extra keys for forward/backward compatibility between webapp/desktop and backend."""
     try:
         contract.params.model_validate(params)
     except ValidationError as exc:
         for err in exc.errors():
             if err.get("type") == "extra_forbidden":
-                loc = ".".join(str(p) for p in err.get("loc", ())) or "params"
-                return None, (f"invalid params for {contract.name}: {loc}: {err.get('msg')} — the client and "
-                              "the Hermes backend are out of sync (different versions); run `hermes update` "
-                              "and restart both")
+                if STRICT:
+                    loc = ".".join(str(p) for p in err.get("loc", ())) or "params"
+                    return None, (f"invalid params for {contract.name}: {loc}: {err.get('msg')} — the client and "
+                                  "the Hermes backend are out of sync (different versions); run `hermes update` "
+                                  "and restart both")
+                logger.debug("Tolerating extra param for %s: %s", contract.name, err)
     return params, None
 
 

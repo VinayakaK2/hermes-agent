@@ -116,6 +116,11 @@ class SeedMessage(Params):
 
 
 class SessionCreateParams(ProfileParams):
+    model_config = ProfileParams.model_config | {"extra": "allow"}
+
+    request_id: str | None = None
+    toolsets: list[str] | None = None
+    reasoning: str | None = None
     cols: int | None = None
     source: str | None = None
     cwd: str | None = None
@@ -152,6 +157,9 @@ method("session.create", params=SessionCreateParams, result=SessionCreateResult,
 
 
 class SessionBranchStoredParams(ProfileParams):
+    model_config = ProfileParams.model_config | {"extra": "allow"}
+
+    request_id: str | None = None
     parent_session_id: str = Field(min_length=1)
     cols: int | None = None
     source: str | None = None
