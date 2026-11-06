@@ -1,0 +1,24 @@
+name: Render Auto-Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Trigger Render Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deploy Hook
+        run: |
+          echo "Triggering Render deployment for commit ${{ github.sha }}..."
+          response=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST "https://api.render.com/deploy/srv-dbmokp6tlv9c73bjgma0?key=O_3P7hOKQGI")
+          status=$(echo "$response" | grep "HTTP_STATUS" | cut -d: -f2)
+          body=$(echo "$response" | grep -v "HTTP_STATUS")
+          echo "Render Response: $body"
+          if [ "$status" -ne 200 ] && [ "$status" -ne 201 ]; then
+            echo "Deployment trigger failed with status $status"
+            exit 1
+          fi
+          echo "Render deployment triggered successfully!"
