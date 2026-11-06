@@ -49,6 +49,7 @@ COPY cloud/default_config.yaml /opt/hermes/cloud/default_config.yaml
 COPY hermes_cli/web_server.py /opt/hermes/hermes_cli/web_server.py
 COPY hermes_cli/web_server_surface.py /opt/hermes/hermes_cli/web_server_surface.py
 COPY hermes_cli/web_server_dashboard.py /opt/hermes/hermes_cli/web_server_dashboard.py
+COPY hermes_cli/plugin_isolation.py /opt/hermes/hermes_cli/plugin_isolation.py
 
 # Copy updated tui_gateway contract modules for Desktop Webapp compatibility
 COPY tui_gateway/contracts/sessions.py /opt/hermes/tui_gateway/contracts/sessions.py

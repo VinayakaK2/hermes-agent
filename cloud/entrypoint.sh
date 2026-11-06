@@ -83,15 +83,25 @@ if isinstance(providers, dict):
     for prov_name, prov_cfg in list(providers.items()):
         if isinstance(prov_cfg, dict):
             key = str(prov_cfg.get('api_key') or '')
-            if (not key or '\${' in key) and prov_name in ('omniroute', 'custom'):
+            if not key or 'omniroute' in prov_name:
                 providers.pop(prov_name, None)
+
+cps = cfg.get('custom_providers')
+if isinstance(cps, list):
+    cfg['custom_providers'] = [
+        cp for cp in cps
+        if isinstance(cp, dict) and 'omniroute' not in str(cp.get('base_url', '')).lower()
+    ]
+    if not cfg['custom_providers']:
+        cfg.pop('custom_providers', None)
 
 # If default model was pointing to a removed/broken provider, reset it
 model = cfg.get('model')
 if isinstance(model, dict):
     def_model = str(model.get('default') or '')
-    if 'omniroute' in def_model and 'omniroute' not in (providers or {}):
+    if any(x in def_model.lower() for x in ('omniroute', 'antigravity')):
         model.pop('default', None)
+        model.pop('provider', None)
 
 dash = cfg.setdefault('dashboard', {})
 dash['host'] = '0.0.0.0'
