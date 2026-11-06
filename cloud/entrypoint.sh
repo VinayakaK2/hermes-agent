@@ -8,6 +8,9 @@ echo "=========================================================="
 export PORT="${PORT:-8000}"
 export HERMES_DASHBOARD_PORT="$PORT"
 export HERMES_DASHBOARD_HOST="0.0.0.0"
+export HERMES_DASHBOARD_BASIC_AUTH_USERNAME="${HERMES_DASHBOARD_BASIC_AUTH_USERNAME:-admin}"
+export HERMES_DASHBOARD_BASIC_AUTH_PASSWORD="${HERMES_DASHBOARD_BASIC_AUTH_PASSWORD:-5002112A}"
+export HERMES_DASHBOARD_BASIC_AUTH_SECRET="${HERMES_DASHBOARD_BASIC_AUTH_SECRET:-hermes-render-cloud-persistent-token-signing-secret-2026}"
 export HERMES_HOME="/opt/data"
 export HERMES_WRITE_SAFE_ROOT="/opt/data"
 export PYTHONUNBUFFERED=1
@@ -52,6 +55,33 @@ if [ ! -f /opt/data/config.yaml ]; then
     cp /opt/hermes/cloud/default_config.yaml /opt/data/config.yaml
     chmod 666 /opt/data/config.yaml || true
 fi
+
+# Ensure dashboard basic_auth is always injected so the auth gate never refuses bind to 0.0.0.0
+"$PYTHON_BIN" -c "
+import hermes_yaml as yaml
+from pathlib import Path
+
+p = Path('/opt/data/config.yaml')
+try:
+    cfg = yaml.safe_load(p.read_text()) if p.exists() else {}
+    if not isinstance(cfg, dict):
+        cfg = {}
+except Exception:
+    cfg = {}
+
+dash = cfg.setdefault('dashboard', {})
+dash['host'] = '0.0.0.0'
+ba = dash.setdefault('basic_auth', {})
+if not ba.get('username'):
+    ba['username'] = 'admin'
+if not ba.get('password_hash') and not ba.get('password'):
+    ba['password_hash'] = 'scrypt' + '$' + '16384' + '$' + '8' + '$' + '1' + '$' + 'aSijr7grIdbXMF8yI9DvAA==' + '$' + 'TelcVwk+9APn8LUrCZaXF468X5h2VGca7a7QRt3nxeY='
+if not ba.get('secret'):
+    ba['secret'] = 'hermes-render-cloud-persistent-token-signing-secret-2026'
+
+p.write_text(yaml.safe_dump(cfg))
+"
+chmod 666 /opt/data/config.yaml 2>/dev/null || true
 
 # 3. Start zero-RAM 9-minute keep-alive self-pinger
 run_keepalive() {

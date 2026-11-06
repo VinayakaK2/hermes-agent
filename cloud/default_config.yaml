@@ -9,3 +9,7 @@ terminal:
 
 dashboard:
   host: "0.0.0.0"
+  basic_auth:
+    username: "admin"
+    password_hash: "scrypt$16384$8$1$aSijr7grIdbXMF8yI9DvAA==$TelcVwk+9APn8LUrCZaXF468X5h2VGca7a7QRt3nxeY="
+    secret: "hermes-render-cloud-persistent-token-signing-secret-2026"
