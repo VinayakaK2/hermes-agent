@@ -17,6 +17,12 @@ export HERMES_WEB_DIST="/opt/hermes/apps/desktop/dist-webapp"
 export HERMES_UI_SURFACE="webapp"
 export PYTHONUNBUFFERED=1
 
+# Memory optimizations for Render Free Tier (512MB RAM)
+export MALLOC_ARENA_MAX=2
+export PYTHONMALLOC=malloc
+export HERMES_TUI_RPC_POOL_WORKERS=2
+export WEB_CONCURRENCY=1
+
 # Resolve Python and Hermes binaries
 PYTHON_BIN="/opt/hermes/.venv/bin/python"
 if [ ! -f "$PYTHON_BIN" ]; then
@@ -70,6 +76,22 @@ try:
         cfg = {}
 except Exception:
     cfg = {}
+
+# Clean up broken / empty custom providers if API key is missing or unresolved
+providers = cfg.get('providers')
+if isinstance(providers, dict):
+    for prov_name, prov_cfg in list(providers.items()):
+        if isinstance(prov_cfg, dict):
+            key = str(prov_cfg.get('api_key') or '')
+            if (not key or '\${' in key) and prov_name in ('omniroute', 'custom'):
+                providers.pop(prov_name, None)
+
+# If default model was pointing to a removed/broken provider, reset it
+model = cfg.get('model')
+if isinstance(model, dict):
+    def_model = str(model.get('default') or '')
+    if 'omniroute' in def_model and 'omniroute' not in (providers or {}):
+        model.pop('default', None)
 
 dash = cfg.setdefault('dashboard', {})
 dash['host'] = '0.0.0.0'

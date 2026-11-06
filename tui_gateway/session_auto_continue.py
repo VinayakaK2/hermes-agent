@@ -451,7 +451,12 @@ def _handle_busy_submit(rid, sid: str, session: dict, text: Any, transport: Any,
     # pending steer buffer — silently destroying the earlier messages of the burst. See #86134.
     if mode == "interrupt" and not image_paths:
         _interrupt_busy_session(sid, session, agent)
-    return _ok(rid, {"status": "queued"})
+    import uuid
+    return _ok(rid, {
+        "status": "queued",
+        "admission_id": str(uuid.uuid4()),
+        "ref": {"session_id": sid, "profile": "default"}
+    })
 
 
 def _drain_queued_prompt(rid, sid: str, session: dict) -> bool:

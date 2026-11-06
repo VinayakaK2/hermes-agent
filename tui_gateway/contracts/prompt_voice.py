@@ -75,6 +75,8 @@ class PromptSubmitResult(Result):
     truncation the survivor row ids let the client rebind its cached ``rowId``s (``None`` map
     entries: drop the cached id). ``turn_isolation`` marks a compute-host dispatch."""
 
+    model_config = Result.model_config | {"extra": "allow"}
+
     status: PromptSubmitStatus | None = None
     voice_stopped: bool | None = None
     # The row written for THIS accepted input, captured before the worker can consume it.
@@ -87,6 +89,7 @@ class PromptSubmitResult(Result):
     # the OWNER's FIFO (``status: queued``) and runs there after the current turn; nothing runs here.
     admission_id: str | None = None
     forwarded: bool | None = None
+    ref: dict[str, JsonValue] | None = None
 
 
 method("prompt.submit", params=PromptSubmitParams, result=PromptSubmitResult,

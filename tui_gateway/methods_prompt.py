@@ -970,7 +970,15 @@ def _(rid, params: dict) -> dict:
     # Handle lets session.interrupt tell a live turn from a stuck `running` flag.
     session["_run_thread"] = run_thread
     run_thread.start()
-    return _ok(rid, {"status": "streaming", **survivor_fields})
+    import uuid
+    admission_id = str(params.get("submission_id") or params.get("input_id") or uuid.uuid4())
+    ref = {"session_id": sid, "profile": params.get("profile") or "default"}
+    return _ok(rid, {
+        "status": "streaming",
+        "admission_id": admission_id,
+        "ref": ref,
+        **survivor_fields
+    })
 
 
 @method("clipboard.paste")

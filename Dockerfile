@@ -32,6 +32,10 @@ ENV HERMES_WRITE_SAFE_ROOT=/opt/data
 ENV HERMES_WEB_DIST=/opt/hermes/apps/desktop/dist-webapp
 ENV HERMES_UI_SURFACE=webapp
 ENV PYTHONUNBUFFERED=1
+ENV MALLOC_ARENA_MAX=2
+ENV PYTHONMALLOC=malloc
+ENV HERMES_TUI_RPC_POOL_WORKERS=2
+ENV WEB_CONCURRENCY=1
 ENV PATH="/opt/hermes/bin:/opt/hermes/.venv/bin:/usr/local/bin:${PATH}"
 
 WORKDIR /opt/hermes
@@ -50,6 +54,8 @@ COPY hermes_cli/web_server_dashboard.py /opt/hermes/hermes_cli/web_server_dashbo
 COPY tui_gateway/contracts/sessions.py /opt/hermes/tui_gateway/contracts/sessions.py
 COPY tui_gateway/contracts/prompt_voice.py /opt/hermes/tui_gateway/contracts/prompt_voice.py
 COPY tui_gateway/contracts/registry.py /opt/hermes/tui_gateway/contracts/registry.py
+COPY tui_gateway/methods_prompt.py /opt/hermes/tui_gateway/methods_prompt.py
+COPY tui_gateway/session_auto_continue.py /opt/hermes/tui_gateway/session_auto_continue.py
 
 RUN chmod +x /opt/hermes/cloud/entrypoint.sh /opt/hermes/cloud/hf_sync.py \
     && mkdir -p /opt/data /tmp/hermes-runtime \
